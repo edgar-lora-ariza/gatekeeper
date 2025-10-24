@@ -1,0 +1,20 @@
+/* Estilos para LoginView - hace que el formulario tenga el mismo fondo que el contenedor */
+
+vaadin-login-form-wrapper {
+  background: transparent !important;
+}
+
+vaadin-login-form::part(form) {
+  background: transparent !important;
+  padding: 0;
+}
+
+vaadin-login-form::part(form-title) {
+  display: none;
+}
+
+/* Asegura que los campos de texto tengan el fondo correcto */
+vaadin-login-form vaadin-text-field,
+vaadin-login-form vaadin-password-field {
+  background: transparent;
+}
