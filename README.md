@@ -514,7 +514,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 For questions or issues:
 - **GitHub Issues**: [Create an issue](https://github.com/yourusername/gatekeeper/issues)
 - **Documentation**: See [CLAUDE.md](CLAUDE.md) for detailed implementation guide
-- **Email**: edgar.lora@bedrock.com
+- **Email**: edgar.lora.ariza@gmail.com
 
 ---
 
