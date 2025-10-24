@@ -518,18 +518,4 @@ For questions or issues:
 
 ---
 
-## 🗺️ Roadmap
-
-- [ ] Multi-tenant support
-- [ ] SAML 2.0 integration
-- [ ] WebAuthn/FIDO2 support
-- [ ] Admin console UI
-- [ ] Client management UI
-- [ ] Audit logging
-- [ ] Rate limiting
-- [ ] Redis session storage
-- [ ] Kubernetes deployment manifests
-
----
-
 **Built with ❤️ by the Bedrock team**
