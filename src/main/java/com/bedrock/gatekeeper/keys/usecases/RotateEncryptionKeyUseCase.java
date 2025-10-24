@@ -1,11 +1,11 @@
-package com.white.label.gatekeeper.application.use.cases.encryption.key;
+package com.bedrock.gatekeeper.keys.usecases;
 
-import com.white.label.gatekeeper.application.use.cases.RotateUseCase;
-import com.white.label.gatekeeper.core.model.EncryptionKey;
-import com.white.label.gatekeeper.core.model.SigningKey;
-import com.white.label.gatekeeper.core.ports.EncryptionKeyPort;
-import com.white.label.gatekeeper.core.ports.SigningKeysPort;
-import com.white.label.gatekeeper.core.services.EncryptionService;
+import com.bedrock.gatekeeper.keys.model.EncryptionKey;
+import com.bedrock.gatekeeper.keys.model.SigningKey;
+import com.bedrock.gatekeeper.keys.ports.EncryptionKeyDataProvider;
+import com.bedrock.gatekeeper.keys.ports.SigningKeysDataProvider;
+import com.bedrock.gatekeeper.keys.services.EncryptionService;
+import io.micrometer.observation.annotation.Observed;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -22,30 +22,31 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
+@Observed
 public class RotateEncryptionKeyUseCase extends RotateUseCase {
 
   private static final List<String> DEPENDENT_BEANS = List.of("GetActiveSigningKeyUseCase", "GetAllSigningKeysUseCase",
       "RotateActiveSigningKeyUseCase", "getEncryptionKey");
 
-  private final SigningKeysPort signingKeysPort;
-  private final EncryptionKeyPort encryptionKeyPort;
+  private final SigningKeysDataProvider signingKeysDataProvider;
+  private final EncryptionKeyDataProvider encryptionKeyDataProvider;
   private final EncryptionService encryptionService;
 
   public RotateEncryptionKeyUseCase(ApplicationContext applicationContext,
-                                    SigningKeysPort signingKeysPort,
-                                    EncryptionKeyPort encryptionKeyPort,
+                                    SigningKeysDataProvider signingKeysDataProvider,
+                                    EncryptionKeyDataProvider encryptionKeyDataProvider,
                                     EncryptionService encryptionService) {
     super(applicationContext);
-    this.signingKeysPort = signingKeysPort;
-    this.encryptionKeyPort = encryptionKeyPort;
+    this.signingKeysDataProvider = signingKeysDataProvider;
+    this.encryptionKeyDataProvider = encryptionKeyDataProvider;
     this.encryptionService = encryptionService;
   }
 
   @Transactional
   public void rotateEncryptionKey() {
-    List<SigningKey> keys = signingKeysPort.getAllKeys();
+    List<SigningKey> keys = signingKeysDataProvider.getAllKeys();
     if (!keys.isEmpty()) {
-      Optional<EncryptionKey> encryptionKeyOptional = encryptionKeyPort.getEncryptionKey();
+      Optional<EncryptionKey> encryptionKeyOptional = encryptionKeyDataProvider.getEncryptionKey();
       encryptionKeyOptional.ifPresent(currentEncryptionKey -> {
         String newEncryptionKey = UUID.randomUUID().toString();
         List<SigningKey> processedSigningKeys = keys.stream()
@@ -53,8 +54,8 @@ public class RotateEncryptionKeyUseCase extends RotateUseCase {
             .map(signingKey -> this.encryptSigningKey(signingKey, newEncryptionKey))
             .toList();
 
-        signingKeysPort.saveAll(processedSigningKeys);
-        encryptionKeyPort.saveEncryptionKey(newEncryptionKey);
+        signingKeysDataProvider.saveAll(processedSigningKeys);
+        encryptionKeyDataProvider.saveEncryptionKey(new EncryptionKey(newEncryptionKey));
 
         refreshDependantBeans();
       });

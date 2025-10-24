@@ -1,4 +1,4 @@
-package com.white.label.gatekeeper.core.services;
+package com.bedrock.gatekeeper.keys.services;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;

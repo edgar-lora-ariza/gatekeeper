@@ -1,13 +1,13 @@
-package com.white.label.gatekeeper.core.ports;
+package com.bedrock.gatekeeper.keys.ports;
 
-import com.white.label.gatekeeper.core.model.EncryptionKey;
+import com.bedrock.gatekeeper.keys.model.EncryptionKey;
 import java.util.Optional;
 
-public interface EncryptionKeyPort {
+public interface EncryptionKeyDataProvider {
 
   Optional<EncryptionKey> getEncryptionKey();
 
-  void saveEncryptionKey(String encryptionKey);
+  void saveEncryptionKey(EncryptionKey encryptionKey);
 
   void deleteEncryptionKey();
 }

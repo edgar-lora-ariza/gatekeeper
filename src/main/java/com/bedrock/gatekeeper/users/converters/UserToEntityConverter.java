@@ -1,14 +1,14 @@
-package com.white.label.gatekeeper.infrastructure.data.providers.converters;
+package com.bedrock.gatekeeper.users.converters;
 
-import com.white.label.gatekeeper.infrastructure.data.providers.entities.AuthorityEntity;
-import com.white.label.gatekeeper.infrastructure.data.providers.entities.UserEntity;
+import com.bedrock.gatekeeper.users.entities.AuthorityEntity;
+import com.bedrock.gatekeeper.users.entities.UserEntity;
 import java.util.stream.Collectors;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserEntityConverter implements Converter<User, UserEntity> {
+public class UserToEntityConverter implements Converter<User, UserEntity> {
 
   @Override
   public UserEntity convert(User source) {

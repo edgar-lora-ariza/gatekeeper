@@ -1,8 +1,8 @@
-package com.white.label.gatekeeper.application.use.cases;
+package com.bedrock.gatekeeper.keys.usecases;
 
-import com.white.label.gatekeeper.core.model.EncryptionKey;
-import com.white.label.gatekeeper.core.model.SigningKey;
-import com.white.label.gatekeeper.core.services.EncryptionService;
+import com.bedrock.gatekeeper.keys.model.EncryptionKey;
+import com.bedrock.gatekeeper.keys.model.SigningKey;
+import com.bedrock.gatekeeper.keys.services.EncryptionService;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;

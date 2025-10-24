@@ -10,10 +10,9 @@ public class EncryptionKeyToEntityConverter implements Converter<EncryptionKey, 
 
   @Override
   public EncryptionKeyEntity convert(EncryptionKey source) {
-    if (source == null) {
-      return null;
-    }
-    // createdAt is handled by @CreationTimestamp
-    return new EncryptionKeyEntity(source.encryptionKey(), null);
+    EncryptionKeyEntity entity = new EncryptionKeyEntity();
+    entity.setEncryptionKey(source.encryptionKey());
+
+    return entity;
   }
 }

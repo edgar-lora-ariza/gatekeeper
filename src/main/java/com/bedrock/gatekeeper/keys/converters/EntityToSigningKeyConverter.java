@@ -10,9 +10,9 @@ public class EntityToSigningKeyConverter implements Converter<SigningKeyEntity, 
 
   @Override
   public SigningKey convert(SigningKeyEntity source) {
-    if (source == null) {
-      return null;
-    }
-    return new SigningKey(source.getId(), source.getKeyIdentifier(), source.getCertificate(), source.getPrivateKey());
+    return new SigningKey(source.getId(),
+        source.getKeyIdentifier(),
+        source.getCertificate(),
+        source.getPrivateKey());
   }
 }

@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS keys.signing_keys (
+    id VARCHAR(36) PRIMARY KEY,
+    key_identifier VARCHAR(255) UNIQUE NOT NULL,
+    certificate TEXT NOT NULL,
+    private_key TEXT NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    version INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    rotated_at TIMESTAMP WITH TIME ZONE
+ );

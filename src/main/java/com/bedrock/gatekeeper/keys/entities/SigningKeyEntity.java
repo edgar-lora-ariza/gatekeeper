@@ -1,10 +1,13 @@
-package com.white.label.gatekeeper.infrastructure.data.providers.entities;
+package com.bedrock.gatekeeper.keys.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.OffsetDateTime;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +24,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 public class SigningKeyEntity {
 
   @Id
-  @Column(name = "id")
+  @GeneratedValue(strategy = GenerationType.UUID)
   private String id;
 
   @Column(name = "key_identifier", unique = true, nullable = false)
@@ -35,6 +38,9 @@ public class SigningKeyEntity {
 
   @Column(name = "is_active", columnDefinition = "boolean default true", nullable = false)
   private Boolean isActive = true;
+
+  @Version
+  private long version;
 
   @CreationTimestamp
   @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP")

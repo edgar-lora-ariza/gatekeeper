@@ -1,4 +1,4 @@
-package com.white.label.gatekeeper.core.utils;
+package com.bedrock.gatekeeper.keys.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

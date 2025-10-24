@@ -1,22 +1,20 @@
-package com.white.label.gatekeeper.core.ports;
+package com.bedrock.gatekeeper.keys.ports;
 
-import com.white.label.gatekeeper.core.model.SigningKey;
+import com.bedrock.gatekeeper.keys.model.SigningKey;
 import java.util.List;
 import java.util.Optional;
 
-public interface SigningKeysPort {
+public interface SigningKeysDataProvider {
 
   SigningKey addKey(String keyIdentifier, String certificate, String privateKeyPem);
 
-  Optional<String> inactivateKey(String id);
-
   Optional<SigningKey> getActiveKey();
-
-  Optional<SigningKey> getKeyById(String id);
 
   Optional<SigningKey> getKeyByKeyIdentifier(String keyIdentifier);
 
   List<SigningKey> getAllKeys();
 
   void saveAll(List<SigningKey> signingKeys);
+
+  void deleteAll(List<SigningKey> signingKeys);
 }

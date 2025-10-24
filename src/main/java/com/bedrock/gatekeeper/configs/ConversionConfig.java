@@ -1,4 +1,4 @@
-package com.white.label.gatekeeper.infrastructure.config;
+package com.bedrock.gatekeeper.configs;
 
 import java.util.Set;
 import org.springframework.context.annotation.Bean;

@@ -10,11 +10,12 @@ public class SigningKeyToEntityConverter implements Converter<SigningKey, Signin
 
   @Override
   public SigningKeyEntity convert(SigningKey source) {
-    if (source == null) {
-      return null;
-    }
-    return new SigningKeyEntity(source.id(), source.keyIdentifier(), source.certificate(),
-        source.privateKey(),
-        true, null, null);
+    SigningKeyEntity entity = new SigningKeyEntity();
+    entity.setId(source.id());
+    entity.setKeyIdentifier(source.keyIdentifier());
+    entity.setCertificate(source.certificate());
+    entity.setPrivateKey(source.privateKey());
+
+    return entity;
   }
 }

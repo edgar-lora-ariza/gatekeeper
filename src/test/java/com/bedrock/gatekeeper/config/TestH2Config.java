@@ -1,4 +1,4 @@
-package com.bedrock.clients.config;
+package com.bedrock.gatekeeper.config;
 
 import javax.sql.DataSource;
 import org.springframework.boot.autoconfigure.flyway.FlywayDataSource;

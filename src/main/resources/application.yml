@@ -1,1 +1,169 @@
-spring.application.name=gatekeeper
+server:
+  port: 9000
+  servlet:
+    context-path: /${spring.application.name}
+    session:
+      tracking-modes: cookie
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+    min-response-size: 2048
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    env:
+      show-values: when_authorized
+    configprops:
+      show-values: when_authorized
+  logging:
+    export:
+      enabled: true
+  tracing:
+    propagation:
+      type: w3c
+    sampling:
+      probability: 1.0
+  metrics:
+    use-global-registry: true
+    distribution:
+      percentiles-histogram:
+        all: true
+  otlp:
+    logging:
+      export:
+        enabled: true
+      transport: http
+      endpoint: http://localhost:4318/v1/logs
+    metrics:
+      export:
+        enabled: true
+        step: 30s
+        url: http://localhost:4318/v1/metrics
+        base-time-unit: seconds
+        histogram-flavor: explicit-bucket-histogram
+    tracing:
+      export:
+        enabled: true
+      transport: http
+      endpoint: http://localhost:4318/v1/traces
+
+logging:
+  level:
+    root: info
+    com.bedrock.gatekeeper: info
+
+otel:
+  resource:
+    attributes:
+      service.name: ${spring.application.name}
+
+spring:
+  application:
+    name: ${APPLICATION_NAME:gatekeeper}
+  docker:
+    compose:
+      enabled: ${DOCKER_COMPOSE_SUPPORT:false}
+      lifecycle-management: start_only
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      pool-name: BedrockGatekeeperHikariPool
+      maximum-pool-size: 50
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  jpa:
+    open-in-view: false
+  security:
+    oauth2:
+      authorizationserver:
+        issuer: ${ISSUER_URI}
+        client:
+          admin-console:
+            registration:
+              client-id: admin-console
+              client-secret: "{bcrypt}$2a$10$ca/2xeZNt0ZGobEo1rWWiO8CfZ.CghXCAFk4cLMXpaP0Gbv0Ld./C"
+              client-name: Admin Console
+              client-authentication-methods:
+                - "client_secret_basic"
+                - "client_secret_post"
+              authorization-grant-types:
+                - "authorization_code"
+                - "refresh_token"
+              redirect-uris:
+                - "https://app.usebruno.com/oauth2/callback"
+              post-logout-redirect-uris:
+                - "http://localhost:9000/api/login"
+              scopes:
+                - "openid"
+                - "profile"
+                - "email"
+            require-authorization-consent: false
+            require-proof-key: true
+            jwk-set-uri: ${spring.security.oauth2.authorizationserver.issuer}/oauth2/jwks
+            token-endpoint-authentication-signing-algorithm: "ES256"
+            token:
+              access-token-format: "self-contained"
+              authorization-code-time-to-live: 1m
+              access-token-time-to-live: 30m
+              refresh-token-time-to-live: 60m
+              device-code-time-to-live: 30m
+              reuse-refresh-tokens: false
+              id-token-signature-algorithm: "ES256"
+      client:
+        registration:
+          google:
+            provider: google
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            client-name: Google
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: authorization_code
+            redirect-uri: ${GOOGLE_REDIRECT_URI}
+            scope:
+              - openid
+              - profile
+              - email
+        provider:
+          google:
+            issuer-uri: ${GOOGLE_ISSUER_URI}
+            authorization-uri: ${GOOGLE_AUTHORIZATION_URI}
+            token-uri: ${GOOGLE_TOKEN_URI}
+            jwk-set-uri: ${GOOGLE_JWKS_URI}
+            user-info-uri: ${GOOGLE_USER_INFO_URI}
+            user-name-attribute: sub
+  threads:
+    virtual:
+      enabled: true
+
+springdoc:
+  show-actuator: ${SPRING_DOC_SHOW_ACTUATOR:false}
+  show-login-endpoint: ${SPRING_DOC_SHOW_LOGIN_ENDPOINT:false}
+  show-oauth2-endpoints: ${SPRING_DOC_SHOW_OAUTH2_ENDPOINTS:false}
+
+vaadin:
+  allowed-packages:
+    - com.bedrock.gatekeeper.commons.views
+
+gatekeeper:
+  admin-console:
+    init:
+      signing-key:
+        key-identifier: ${SIGNING_KEY_IDENTIFIER}
+        certificate: ${SIGNING_KEY_CERTIFICATE}
+        private-key: ${SIGNING_KEY_PRIVATE_KEY}
+      admin:
+        email: ${ADMIN_CONSOLE_EMAIL}
+        password: ${ADMIN_CONSOLE_PASSWORD}
+      clients:
+        google:
+          access-uri: /oauth2/authorization/google

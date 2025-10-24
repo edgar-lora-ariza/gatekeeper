@@ -1,16 +1,19 @@
-package com.white.label.gatekeeper.infrastructure.data.providers;
+package com.bedrock.gatekeeper.users.data.providers;
 
-import com.white.label.gatekeeper.core.ports.UserPort;
-import com.white.label.gatekeeper.infrastructure.data.providers.entities.UserEntity;
-import com.white.label.gatekeeper.infrastructure.data.providers.repositories.UserRepository;
+import com.bedrock.gatekeeper.users.entities.UserEntity;
+import com.bedrock.gatekeeper.users.model.CustomUser;
+import com.bedrock.gatekeeper.users.ports.UserDataProvider;
+import com.bedrock.gatekeeper.users.repositories.UserRepository;
+import io.micrometer.observation.annotation.Observed;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
-public class UserJpaDataProvider implements UserPort {
+@Service
+@Observed
+public class UserJpaDataProvider implements UserDataProvider {
 
   private final UserRepository userRepository;
   private final ConversionService conversionService;
@@ -22,15 +25,17 @@ public class UserJpaDataProvider implements UserPort {
   }
 
   @Override
-  public User save(User user) {
+  public CustomUser save(User user) {
     UserEntity entity = conversionService.convert(user, UserEntity.class);
-
+    userRepository.findByUsername(user.getUsername())
+        .ifPresent(userEntity -> Objects.requireNonNull(entity)
+            .setId(userEntity.getId()));
     UserEntity savedEntity = userRepository.save(Objects.requireNonNull(entity));
-    return conversionService.convert(savedEntity, User.class);
+    return conversionService.convert(savedEntity, CustomUser.class);
   }
 
   @Override
-  public Optional<User> findByUsername(String username) {
+  public Optional<CustomUser> findByUsername(String username) {
     Optional<UserEntity> userOptional = userRepository
         .findByUsername(username);
 
@@ -39,7 +44,7 @@ public class UserJpaDataProvider implements UserPort {
     }
 
     UserEntity userEntity = userOptional.get();
-    User user = conversionService.convert(userEntity, User.class);
+    CustomUser user = conversionService.convert(userEntity, CustomUser.class);
     return Optional.of(Objects.requireNonNull(user));
   }
 

@@ -1,38 +1,43 @@
-package com.white.label.gatekeeper.infrastructure.data.providers;
+package com.bedrock.gatekeeper.keys.data.providers;
 
-import com.white.label.gatekeeper.infrastructure.data.providers.entities.EncryptionKeyEntity;
-import com.white.label.gatekeeper.infrastructure.data.providers.repositories.EncryptionKeyJpaRepository;
-import com.white.label.gatekeeper.core.model.EncryptionKey;
-import com.white.label.gatekeeper.core.ports.EncryptionKeyPort;
+import com.bedrock.gatekeeper.keys.entities.EncryptionKeyEntity;
+import com.bedrock.gatekeeper.keys.model.EncryptionKey;
+import com.bedrock.gatekeeper.keys.ports.EncryptionKeyDataProvider;
+import com.bedrock.gatekeeper.keys.repositories.EncryptionKeyRepository;
+import io.micrometer.observation.annotation.Observed;
+import java.util.Objects;
+import org.springframework.core.convert.ConversionService;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EncryptionKeyJpaDataProvider implements EncryptionKeyPort {
+@Observed
+public class EncryptionKeyJpaDataProvider implements EncryptionKeyDataProvider {
 
-  private final EncryptionKeyJpaRepository encryptionKeyJpaRepository;
+  private final EncryptionKeyRepository encryptionKeyRepository;
+  private final ConversionService conversionService;
 
-  public EncryptionKeyJpaDataProvider(EncryptionKeyJpaRepository encryptionKeyJpaRepository) {
-    this.encryptionKeyJpaRepository = encryptionKeyJpaRepository;
+  public EncryptionKeyJpaDataProvider(EncryptionKeyRepository encryptionKeyRepository,
+      ConversionService conversionService) {
+    this.encryptionKeyRepository = encryptionKeyRepository;
+    this.conversionService = conversionService;
   }
 
   @Override
   public Optional<EncryptionKey> getEncryptionKey() {
-    return encryptionKeyJpaRepository.findAll().stream()
-        .map(EncryptionKeyEntity::getEncryptionKey)
-        .map(EncryptionKey::new)
-        .findFirst();
+    return encryptionKeyRepository.findAll().stream()
+        .findFirst()
+        .map(entity -> conversionService.convert(entity, EncryptionKey.class));
   }
 
   @Override
-  public void saveEncryptionKey(String encryptionKey) {
-    EncryptionKeyEntity encryptionKeyEntity = new EncryptionKeyEntity();
-    encryptionKeyEntity.setEncryptionKey(encryptionKey);
-    encryptionKeyJpaRepository.save(encryptionKeyEntity);
+  public void saveEncryptionKey(EncryptionKey encryptionKey) {
+    EncryptionKeyEntity entity = conversionService.convert(encryptionKey, EncryptionKeyEntity.class);
+    encryptionKeyRepository.save(Objects.requireNonNull(entity));
   }
 
   @Override
   public void deleteEncryptionKey() {
-    encryptionKeyJpaRepository.deleteAll();
+    encryptionKeyRepository.deleteAll();
   }
 }

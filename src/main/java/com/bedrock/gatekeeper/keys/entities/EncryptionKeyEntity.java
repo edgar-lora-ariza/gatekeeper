@@ -1,4 +1,4 @@
-package com.white.label.gatekeeper.infrastructure.data.providers.entities;
+package com.bedrock.gatekeeper.keys.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

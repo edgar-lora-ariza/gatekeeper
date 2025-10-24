@@ -1,7 +1,6 @@
-package com.bedrock.users.dtos;
+package com.bedrock.gatekeeper.users.dtos;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
 
 @Schema(description = "Represents the data required to change a user's password.")
 public record ChangePasswordDto(@Schema(description = "The user's current password.", example = "password123")

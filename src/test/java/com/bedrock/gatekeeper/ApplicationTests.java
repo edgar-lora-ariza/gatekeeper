@@ -9,7 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
 @SpringBootTest()
 @ActiveProfiles("test")
 @ContextConfiguration(classes = {TestH2Config.class})
-class GatekeeperApplicationTests {
+class ApplicationTests {
 
   @Test
   void contextLoads() {

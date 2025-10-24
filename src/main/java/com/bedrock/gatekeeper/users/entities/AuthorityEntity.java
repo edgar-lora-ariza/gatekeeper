@@ -1,11 +1,23 @@
-package com.white.label.gatekeeper.infrastructure.data.providers.entities;
+package com.bedrock.gatekeeper.users.entities;
 
-import jakarta.persistence.*;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 
-@Data
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "authorities", schema = "auth")
 public class AuthorityEntity implements GrantedAuthority {
 
@@ -17,6 +29,7 @@ public class AuthorityEntity implements GrantedAuthority {
   private String name;
 
   @Override
+  @JsonIgnore
   public String getAuthority() {
     return this.name;
   }

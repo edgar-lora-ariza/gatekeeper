@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS auth.external_users (
+    id VARCHAR(36) PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE
+);

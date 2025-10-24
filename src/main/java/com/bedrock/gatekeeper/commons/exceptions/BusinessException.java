@@ -1,19 +1,14 @@
-package com.white.label.gatekeeper.core.exceptions;
+package com.bedrock.gatekeeper.commons.exceptions;
 
 import lombok.Getter;
 
 @Getter
 public class BusinessException extends RuntimeException {
 
-  private final String ErrorCode;
+  private final String errorCode;
 
-  public BusinessException(String message, String ErrorCode) {
+  public BusinessException(String message, String errorCode) {
     super(message);
-    this.ErrorCode = ErrorCode;
-  }
-
-  public BusinessException(String message, Throwable cause, String ErrorCode) {
-    super(message, cause);
-    this.ErrorCode = ErrorCode;
+    this.errorCode = errorCode;
   }
 }

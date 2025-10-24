@@ -1,12 +1,13 @@
-package com.white.label.gatekeeper.core.ports;
+package com.bedrock.gatekeeper.users.ports;
 
+import com.bedrock.gatekeeper.users.model.CustomUser;
 import java.util.Optional;
 import org.springframework.security.core.userdetails.User;
 
-public interface UserPort {
-  User save(User user);
+public interface UserDataProvider {
+  CustomUser save(User user);
 
-  Optional<User> findByUsername(String username);
+  Optional<CustomUser> findByUsername(String username);
 
   void deleteByUsername(String username);
 

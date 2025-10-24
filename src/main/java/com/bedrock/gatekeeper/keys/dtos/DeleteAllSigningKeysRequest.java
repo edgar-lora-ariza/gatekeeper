@@ -1,4 +1,7 @@
 package com.bedrock.gatekeeper.keys.dtos;
 
-public record DeleteAllSigningKeysRequest() {
+import com.bedrock.gatekeeper.keys.model.SigningKey;
+import java.util.List;
+
+public record DeleteAllSigningKeysRequest(List<SigningKey> signingKeys) {
 }

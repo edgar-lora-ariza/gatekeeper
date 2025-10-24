@@ -1,1 +1,12 @@
+version: '3.8'
+
 services:
+  postgres:
+    image: postgres:14.19-alpine
+    container_name: postgres-gatekeeper
+    environment:
+      POSTGRES_DB: gatekeeper
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    ports:
+      - "5431:5432"

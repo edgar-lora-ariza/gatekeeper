@@ -1,7 +1,7 @@
-package com.white.label.gatekeeper.application.use.cases;
+package com.bedrock.gatekeeper.keys.usecases;
 
-import com.white.label.gatekeeper.core.model.EncryptionKey;
-import com.white.label.gatekeeper.core.model.SigningKey;
+import com.bedrock.gatekeeper.keys.model.EncryptionKey;
+import com.bedrock.gatekeeper.keys.model.SigningKey;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;

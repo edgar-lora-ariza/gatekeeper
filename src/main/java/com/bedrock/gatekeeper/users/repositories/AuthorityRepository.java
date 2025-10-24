@@ -1,6 +1,6 @@
-package com.white.label.gatekeeper.infrastructure.data.providers.repositories;
+package com.bedrock.gatekeeper.users.repositories;
 
-import com.white.label.gatekeeper.infrastructure.data.providers.entities.AuthorityEntity;
+import com.bedrock.gatekeeper.users.entities.AuthorityEntity;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

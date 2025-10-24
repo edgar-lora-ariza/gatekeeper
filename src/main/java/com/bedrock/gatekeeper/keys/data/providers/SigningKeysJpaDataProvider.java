@@ -1,132 +1,82 @@
-package com.white.label.gatekeeper.infrastructure.data.providers;
+package com.bedrock.gatekeeper.keys.data.providers;
 
-import com.white.label.gatekeeper.core.model.SigningKey;
-import com.white.label.gatekeeper.infrastructure.data.providers.entities.SigningKeyEntity;
-import com.white.label.gatekeeper.core.ports.SigningKeysPort;
-import com.white.label.gatekeeper.infrastructure.data.providers.repositories.SigningKeysJpaRepository;
+import com.bedrock.gatekeeper.keys.entities.SigningKeyEntity;
+import com.bedrock.gatekeeper.keys.model.SigningKey;
+import com.bedrock.gatekeeper.keys.ports.SigningKeysDataProvider;
+import com.bedrock.gatekeeper.keys.repositories.SigningKeysRepository;
+import io.micrometer.observation.annotation.Observed;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class SigningKeysJpaDataProvider implements SigningKeysPort {
+@Observed
+public class SigningKeysJpaDataProvider implements SigningKeysDataProvider {
 
-  private final SigningKeysJpaRepository signingKeysJpaRepository;
+  private final SigningKeysRepository signingKeysRepository;
+  private final ConversionService conversionService;
 
-  public SigningKeysJpaDataProvider(SigningKeysJpaRepository signingKeysJpaRepository) {
-    this.signingKeysJpaRepository = signingKeysJpaRepository;
+  public SigningKeysJpaDataProvider(SigningKeysRepository signingKeysRepository,
+                                    ConversionService conversionService) {
+    this.signingKeysRepository = signingKeysRepository;
+    this.conversionService = conversionService;
   }
 
   @Override
   @Transactional
   public SigningKey addKey(String keyIdentifier, String certificate, String privateKey) {
-    String id = UUID.randomUUID().toString();
 
     SigningKeyEntity signingKeyEntity = new SigningKeyEntity();
-    signingKeyEntity.setId(id);
     signingKeyEntity.setKeyIdentifier(keyIdentifier);
     signingKeyEntity.setCertificate(certificate);
     signingKeyEntity.setPrivateKey(privateKey);
 
-    SigningKeyEntity savedKey = signingKeysJpaRepository.save(signingKeyEntity);
+    SigningKeyEntity savedKey = signingKeysRepository.save(signingKeyEntity);
     this.deactivateOtherKeys(savedKey.getId());
 
-    return new SigningKey(signingKeyEntity.getId(),
-        signingKeyEntity.getKeyIdentifier(),
-        signingKeyEntity.getCertificate(),
-        signingKeyEntity.getPrivateKey());
-  }
-
-  @Override
-  public Optional<String> inactivateKey(String id) {
-    Optional<SigningKeyEntity> signingKeyOptional = signingKeysJpaRepository.findById(id);
-
-    if (signingKeyOptional.isPresent()) {
-      SigningKeyEntity signingKeyEntity = signingKeyOptional.get();
-      signingKeyEntity.setIsActive(false);
-      return Optional.of(signingKeysJpaRepository.save(signingKeyEntity).getId());
-    }
-
-    return Optional.empty();
+    return conversionService.convert(savedKey, SigningKey.class);
   }
 
   @Override
   public Optional<SigningKey> getActiveKey() {
-    Optional<SigningKeyEntity> activeSigningKeyOptional = signingKeysJpaRepository
-        .findByIsActive(true)
-        .stream()
-        .findFirst();
-
-    if (activeSigningKeyOptional.isPresent()) {
-      SigningKeyEntity signingKeyEntity = activeSigningKeyOptional.get();
-      SigningKey signingKey = new SigningKey(signingKeyEntity.getId(),
-          signingKeyEntity.getKeyIdentifier(),
-          signingKeyEntity.getCertificate(),
-          signingKeyEntity.getPrivateKey());
-      return Optional.of(signingKey);
-    }
-
-    return Optional.empty();
-  }
-
-  @Override
-  public Optional<SigningKey> getKeyById(String id) {
-    Optional<SigningKeyEntity> signingKeyEntityOptional = signingKeysJpaRepository.findById(id);
-    if (signingKeyEntityOptional.isPresent()) {
-      SigningKeyEntity signingKeyEntity = signingKeyEntityOptional.get();
-
-      return Optional.of(new SigningKey(signingKeyEntity.getId(),
-          signingKeyEntity.getKeyIdentifier(),
-          signingKeyEntity.getCertificate(),
-          signingKeyEntity.getPrivateKey()));
-    }
-
-    return Optional.empty();
+    return signingKeysRepository.findByIsActive(true).stream()
+        .findFirst()
+        .map(entity -> conversionService.convert(entity, SigningKey.class));
   }
 
   @Override
   public Optional<SigningKey> getKeyByKeyIdentifier(String keyIdentifier) {
-    Optional<SigningKeyEntity> signingKeyEntityOptional = signingKeysJpaRepository.findByKeyIdentifier(keyIdentifier).stream()
-        .findFirst();
-    if (signingKeyEntityOptional.isPresent()) {
-      SigningKeyEntity signingKeyEntity = signingKeyEntityOptional.get();
-
-      return Optional.of(new SigningKey(signingKeyEntity.getId(),
-          signingKeyEntity.getKeyIdentifier(),
-          signingKeyEntity.getCertificate(),
-          signingKeyEntity.getPrivateKey()));
-    }
-
-    return Optional.empty();
+    return signingKeysRepository.findByKeyIdentifier(keyIdentifier).stream().findFirst()
+        .map(entity -> conversionService.convert(entity, SigningKey.class));
   }
 
   @Override
   public List<SigningKey> getAllKeys() {
-    return signingKeysJpaRepository.findAll().stream()
-        .map(signingKeyEntity -> new SigningKey(signingKeyEntity.getId(),
-            signingKeyEntity.getKeyIdentifier(),
-            signingKeyEntity.getCertificate(),
-            signingKeyEntity.getPrivateKey()))
-        .toList();
+    return signingKeysRepository.findAll().stream().map(
+        entity -> conversionService.convert(entity, SigningKey.class)
+    ).toList();
   }
 
   @Override
   public void saveAll(List<SigningKey> signingKeys) {
     List<SigningKeyEntity> signingKeyEntities = signingKeys.stream()
-        .map(signingKey -> {
-          SigningKeyEntity signingKeyEntity = new SigningKeyEntity();
-          signingKeyEntity.setId(signingKey.id());
-          signingKeyEntity.setKeyIdentifier(signingKey.keyIdentifier());
-          signingKeyEntity.setCertificate(signingKey.certificate());
-          signingKeyEntity.setPrivateKey(signingKey.privateKey());
-          return  signingKeyEntity;
-        }).toList();
-    signingKeysJpaRepository.saveAll(signingKeyEntities);
+        .map(key -> conversionService.convert(key, SigningKeyEntity.class)).toList();
+    signingKeysRepository.saveAll(signingKeyEntities);
+  }
+
+  @Override
+  public void deleteAll(List<SigningKey> signingKeys) {
+    signingKeysRepository.deleteAllById(signingKeys.stream().map(SigningKey::id).toList());
   }
 
   private void deactivateOtherKeys(String id) {
-    signingKeysJpaRepository.deactivateOtherKeys(id);
+    List<SigningKeyEntity> otherActiveKeys = signingKeysRepository.findByIsActive(true).stream()
+        .filter(key -> !key.getId().equals(id))
+        .toList();
+
+    otherActiveKeys.forEach(key -> key.setIsActive(false));
+    signingKeysRepository.saveAll(otherActiveKeys);
   }
 }

@@ -10,9 +10,6 @@ public class EntityToEncryptionKeyConverter implements Converter<EncryptionKeyEn
 
   @Override
   public EncryptionKey convert(EncryptionKeyEntity source) {
-    if (source == null) {
-      return null;
-    }
     return new EncryptionKey(source.getEncryptionKey());
   }
 }

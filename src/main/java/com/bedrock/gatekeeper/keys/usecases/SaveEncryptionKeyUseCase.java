@@ -1,19 +1,22 @@
-package com.white.label.gatekeeper.application.use.cases.encryption.key;
+package com.bedrock.gatekeeper.keys.usecases;
 
-import com.white.label.gatekeeper.core.ports.EncryptionKeyPort;
+import com.bedrock.gatekeeper.keys.model.EncryptionKey;
+import com.bedrock.gatekeeper.keys.ports.EncryptionKeyDataProvider;
+import io.micrometer.observation.annotation.Observed;
 import org.springframework.stereotype.Service;
 
 @Service
+@Observed
 public class SaveEncryptionKeyUseCase {
 
-  private final EncryptionKeyPort encryptionKeyPort;
+  private final EncryptionKeyDataProvider encryptionKeyPort;
 
-  public SaveEncryptionKeyUseCase(EncryptionKeyPort encryptionKeyPort) {
+  public SaveEncryptionKeyUseCase(EncryptionKeyDataProvider encryptionKeyPort) {
     this.encryptionKeyPort = encryptionKeyPort;
   }
 
   public void saveEncryptionKey(String encryptionKey) {
     encryptionKeyPort.deleteEncryptionKey();
-    encryptionKeyPort.saveEncryptionKey(encryptionKey);
+    encryptionKeyPort.saveEncryptionKey(new EncryptionKey(encryptionKey));
   }
 }
